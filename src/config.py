@@ -31,16 +31,19 @@ class ConfigTarget:
 @dataclass
 class Config:
     targets: list[ConfigTarget]
+    verbose: bool = True
 
 
 def read_config(path: str = CONFIG_PATH) -> Config:
     try:
         with open(path, "r") as f:
+            raw = json.load(f)
             config = Config(
+                verbose=raw.get("verbose", True),
                 targets=[
                     ConfigTarget(id=id_, **kwargs)
-                    for id_, kwargs in enumerate(json.load(f).get("targets", []))
-                ]
+                    for id_, kwargs in enumerate(raw.get("targets", []))
+                ],
             )
     except (json.JSONDecodeError, FileNotFoundError, OSError, TypeError) as e:
         print("\tUnable to load/decode config!")

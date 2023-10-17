@@ -5,16 +5,17 @@ import shutil
 import tarfile
 import uuid
 
-from config import BackupStrategy, ConfigTarget
+from config import BackupStrategy, Config, ConfigTarget
 
 
-def _try_clean(target: ConfigTarget) -> None:
+def _try_clean(config: Config, target: ConfigTarget) -> None:
     if target.clean_limit == 0:
         return
     content = os.listdir(target.path_to)
     if len(content) < target.clean_limit:
         return
-    print("Removing old backups...")
+    if config.verbose:
+        print("Removing old backups...")
     legacy_content = content[: 1 + len(content) - target.clean_limit]
     for raw_path in legacy_content:
         path = pathlib.Path(target.path_to, raw_path)
@@ -63,21 +64,23 @@ def as_tar(target: ConfigTarget, backup_to: pathlib.Path) -> int:
     return os.path.getsize(backup_to)
 
 
-def as_copy(target: ConfigTarget, backup_to: pathlib.Path) -> int:
+def as_copy(config: Config, target: ConfigTarget, backup_to: pathlib.Path) -> int:
     try:
         shutil.copytree(target.path_from, backup_to, dirs_exist_ok=target.overwrite)
     except FileExistsError:
-        print("[skipped due to exists and no overwrite enabled]")
+        if config.verbose:
+            print("[skipped due to exists and no overwrite enabled]")
         return 0
     return get_size(backup_to)
 
 
-def run_strategy(target: ConfigTarget) -> None:
+def run_strategy(target: ConfigTarget, config: Config) -> None:
     backup_to = _format_path_with_name(target)
     _prepare(target)
-    _try_clean(target)
+    _try_clean(config, target)
     if target.strategy == BackupStrategy.COPY:
-        size = as_copy(target, backup_to)
+        size = as_copy(config, target, backup_to)
     if target.strategy == BackupStrategy.TAR:
         size = as_tar(target, backup_to)
-    print("Created new backup with size", size, "bytes!")
+    if config.verbose:
+        print("Created new backup with size", size, "bytes!")

@@ -1,4 +1,5 @@
 {
+    "verbose": false,
     "targets": [
         {
             "path_from": "./from",
