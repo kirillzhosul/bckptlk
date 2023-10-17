@@ -1,9 +1,19 @@
 {
     "targets": [
         {
-            "path_from": "../from",
-            "path_to": "../to/{m}_{d}_{y}.tar",
-            "overwrite": true,
+            "path_from": "./from",
+            "path_to": "./to_copy/",
+            "name": "{m}_{d}_{y}-{H}_{M}_{S}",
+            "clean_limit": 3,
+            "overwrite": false,
+            "strategy": "copy"
+        },
+        {
+            "path_from": "./from",
+            "path_to": "./to_tar/",
+            "name": "{m}_{d}_{y}-{H}_{M}_{S}.tar",
+            "clean_limit": 3,
+            "overwrite": false,
             "strategy": "tar"
         }
     ]

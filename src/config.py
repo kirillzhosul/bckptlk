@@ -1,5 +1,6 @@
 import json
 import os
+import pathlib
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -14,13 +15,17 @@ class BackupStrategy(Enum):
 @dataclass
 class ConfigTarget:
     id: int
-    path_from: str
-    path_to: str
+    path_from: pathlib.Path
+    name: str
+    path_to: pathlib.Path
     strategy: BackupStrategy = field(default=BackupStrategy.COPY)
+    clean_limit: int = 0
     overwrite: bool = False
 
     def __post_init__(self):
         self.strategy = BackupStrategy(self.strategy)
+        self.path_to = pathlib.Path(self.path_to)
+        self.path_from = pathlib.Path(self.path_from)
 
 
 @dataclass
