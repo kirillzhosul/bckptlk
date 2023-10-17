@@ -1,0 +1,10 @@
+{
+    "targets": [
+        {
+            "path_from": "../from",
+            "path_to": "../to/{m}_{d}_{y}.tar",
+            "overwrite": true,
+            "strategy": "tar"
+        }
+    ]
+}
