@@ -15,7 +15,10 @@
             "name": "{m}_{d}_{y}-{H}_{M}_{S}.tar",
             "clean_limit": 3,
             "overwrite": false,
-            "strategy": "tar"
+            "strategy": "tar",
+            "additional": {
+                "compression": "gz"
+            }
         }
     ]
 }

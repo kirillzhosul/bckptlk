@@ -2,14 +2,10 @@ import json
 import os
 import pathlib
 from dataclasses import dataclass, field
-from enum import Enum
+
+from strategies.types import StrategyType
 
 CONFIG_PATH = os.getenv("BCKPTLK_CONFIG_PATH", "./config.json")
-
-
-class BackupStrategy(Enum):
-    COPY = "copy"
-    TAR = "tar"
 
 
 @dataclass
@@ -18,12 +14,13 @@ class ConfigTarget:
     path_from: pathlib.Path
     name: str
     path_to: pathlib.Path
-    strategy: BackupStrategy = field(default=BackupStrategy.COPY)
+    strategy: StrategyType = field(default=StrategyType.COPY)
     clean_limit: int = 0
     overwrite: bool = False
+    additional: dict = field(default=dict)
 
     def __post_init__(self):
-        self.strategy = BackupStrategy(self.strategy)
+        self.strategy = StrategyType(self.strategy)
         self.path_to = pathlib.Path(self.path_to)
         self.path_from = pathlib.Path(self.path_from)
 
@@ -45,7 +42,7 @@ def read_config(path: str = CONFIG_PATH) -> Config:
                     for id_, kwargs in enumerate(raw.get("targets", []))
                 ],
             )
-    except (json.JSONDecodeError, FileNotFoundError, OSError, TypeError) as e:
+    except (json.JSONDecodeError, OSError, TypeError) as e:
         print("\tUnable to load/decode config!")
         print("\tError:", repr(e))
         exit(1)
