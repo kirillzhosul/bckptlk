@@ -2,10 +2,13 @@ import json
 import os
 import pathlib
 from dataclasses import dataclass, field
+from logging import getLogger
 
 from strategies.types import StrategyType
 
 CONFIG_PATH = os.getenv("BCKPTLK_CONFIG_PATH", "./config.json")
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -43,7 +46,6 @@ def read_config(path: str = CONFIG_PATH) -> Config:
                 ],
             )
     except (json.JSONDecodeError, OSError, TypeError) as e:
-        print("\tUnable to load/decode config!")
-        print("\tError:", repr(e))
+        logger.error("Unable to load/decode config!", exc_info=e)
         exit(1)
     return config
